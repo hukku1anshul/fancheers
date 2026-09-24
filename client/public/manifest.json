@@ -1,0 +1,18 @@
+{
+  "name": "FanPulse - Virtual Stadium & Live Cheer Map",
+  "short_name": "FanPulse",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f1d",
+  "theme_color": "#10b981",
+  "orientation": "portrait-primary",
+  "description": "Experience the virtual stadium with synchronized live cheers, TV delay sync, procedural crowd audio, and global fan territory conquest.",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%2310b981'/><text x='50%' y='55%' font-size='50' text-anchor='middle' dominant-baseline='middle'>🏟️</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

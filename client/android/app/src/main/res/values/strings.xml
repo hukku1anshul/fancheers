@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">FanPulse</string>
+    <string name="title_activity_main">FanPulse</string>
+    <string name="package_name">app.fanpulse.mobile</string>
+    <string name="custom_url_scheme">app.fanpulse.mobile</string>
+</resources>

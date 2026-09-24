@@ -1,0 +1,29 @@
+{
+  "name": "fancheers",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FanPulse / FanCheers - Real-Time Global Sports Atmosphere Layer & Fan Stadium Sync",
+  "type": "module",
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "build": "npm --prefix server install && npm --prefix client install && npm --prefix client run build",
+    "start": "node server/src/index.js",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "sports",
+    "stadium",
+    "fan-pulse",
+    "fancheers",
+    "live-scores",
+    "websocket",
+    "android",
+    "capacitor"
+  ],
+  "author": "hukku",
+  "license": "MIT"
+}

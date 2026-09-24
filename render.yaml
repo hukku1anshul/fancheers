@@ -1,0 +1,20 @@
+# Render Blueprint Specification for FanCheers / FanPulse
+# Auto-Deploy enabled on git push to main
+# Documentation: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: fancheers
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: PORT
+        value: 10000
+    autoDeploy: true
+    healthCheckPath: /api/health

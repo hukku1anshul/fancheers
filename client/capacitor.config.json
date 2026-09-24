@@ -1,0 +1,12 @@
+{
+  "appId": "app.fanpulse.mobile",
+  "appName": "FanPulse",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
