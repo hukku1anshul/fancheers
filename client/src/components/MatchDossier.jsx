@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Star, Award, ShieldAlert, Clock, ChevronRight, X, Sparkles, TrendingUp } from 'lucide-react';
 import { hapticEngine } from '../services/hapticEngine';
 import { fanEconomy } from '../services/fanEconomyService';
+import { getApiBaseUrl } from '../services/socket';
 
 export default function MatchDossier({ match, isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('lineups'); // 'lineups' | 'ratings' | 'timeline'
@@ -18,7 +19,8 @@ export default function MatchDossier({ match, isOpen, onClose }) {
 
     const fetchIntel = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/match/${match.id}/intelligence`);
+        const baseUrl = getApiBaseUrl();
+        const res = await fetch(`${baseUrl}/api/match/${match.id}/intelligence`);
         if (res.ok) {
           const data = await res.json();
           setIntelligence(data);
@@ -42,7 +44,8 @@ export default function MatchDossier({ match, isOpen, onClose }) {
     if (!selectedPlayer) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/api/match/${match.id}/rate-player`, {
+      const baseUrl = getApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/match/${match.id}/rate-player`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ playerId: selectedPlayer.id, rating: userRating })
@@ -76,8 +79,14 @@ export default function MatchDossier({ match, isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-4 animate-fadeIn">
-      <div className="bg-slate-900 border border-white/10 rounded-t-3xl sm:rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl text-white">
+    <div 
+      className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-4 animate-fadeIn"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-slate-900 border border-white/10 rounded-t-3xl sm:rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl text-white"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Header Bar */}
         <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between bg-white/5">

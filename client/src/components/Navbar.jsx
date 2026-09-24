@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, MapPin, Trophy, Flame, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Volume2, VolumeX, MapPin, Trophy, Flame, ChevronDown, Sun, Moon, Menu, Server, Wifi } from 'lucide-react';
 import { soundEngine } from '../services/soundEffects';
 
 const POPULAR_LOCATIONS = [
@@ -16,6 +16,9 @@ const POPULAR_LOCATIONS = [
 ];
 
 export default function Navbar({
+  onOpenServerModal,
+  serverStatus = 'connected',
+  onOpenMobileDrawer,
   onOpenPassport,
   onOpenSquad,
   onOpenStands,
@@ -104,9 +107,58 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Quick Right Controls: Theme + Audio */}
-          <div className="flex items-center gap-1.5">
+          {/* Mobile Right Controls (Clean, native 3-item bar for Android & iPhone) */}
+          <div className="flex md:hidden items-center gap-1.5">
+            {/* Live Connection Status Pill */}
+            <button
+              onClick={onOpenServerModal}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[11px] font-extrabold shadow-sm active:scale-95 transition ${
+                serverStatus === 'connected'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                  : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700'
+              }`}
+              title="Server Connection Status (Tap to configure)"
+            >
+              <span className={`w-2 h-2 rounded-full ${serverStatus === 'connected' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+              <span>{serverStatus === 'connected' ? 'Live' : 'Connect'}</span>
+            </button>
+
+            {/* Bright / Night Theme Switcher */}
+            <button
+              onClick={onToggleTheme}
+              className="p-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-pitch-700 text-slate-700 dark:text-slate-200 active:scale-95 transition shadow-sm"
+              title="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
+            </button>
+
+            {/* Native Mobile Menu / Hub Button */}
+            <button
+              onClick={onOpenMobileDrawer}
+              className="p-2 rounded-xl border border-stadium-turf/40 bg-stadium-turf/10 text-stadium-turf dark:text-stadium-neon active:scale-95 transition shadow-sm flex items-center justify-center"
+              title="Open Stadium Hub"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Desktop Right Controls (hidden on mobile) */}
+          <div className="hidden md:flex items-center gap-1.5">
             
+            {/* Server Connection Button */}
+            <button
+              onClick={onOpenServerModal}
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl border font-extrabold text-xs active:scale-95 transition shadow-sm ${
+                serverStatus === 'connected'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
+                  : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700'
+              }`}
+              title="Server Connection Settings"
+            >
+              <Server className="w-3.5 h-3.5" />
+              <span>{serverStatus === 'connected' ? 'Cloud Live' : 'Server'}</span>
+            </button>
+
             {/* Bright / Night Theme Switcher */}
             <button
               onClick={onToggleTheme}

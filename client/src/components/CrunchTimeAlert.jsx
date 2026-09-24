@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Flame, ArrowRight, X, Bell, Zap, Radio } from 'lucide-react';
 import { soundEngine } from '../services/soundEffects';
+import { getApiBaseUrl } from '../services/socket';
 
 export default function CrunchTimeAlert({ onJumpIn, currentMatchId }) {
   const [alert, setAlert] = useState(null);
@@ -9,7 +10,8 @@ export default function CrunchTimeAlert({ onJumpIn, currentMatchId }) {
   useEffect(() => {
     const fetchAlert = async () => {
       try {
-        const res = await fetch('http://localhost:3001/api/crunch-alerts');
+        const baseUrl = getApiBaseUrl();
+        const res = await fetch(`${baseUrl}/api/crunch-alerts`);
         if (res.ok) {
           const data = await res.json();
           if (data.alerts && data.alerts.length > 0) {

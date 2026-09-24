@@ -1,13 +1,18 @@
 import React from 'react';
 import { X, Award, Flame, Shield, Trophy, CheckCircle, Zap, Star } from 'lucide-react';
+import { passportService } from '../services/passportService';
 
 export default function SuperfanPassport({ isOpen, onClose, passportData }) {
   if (!isOpen) return null;
 
-  const { xp, level, tier, totalCheers, matchesAttended, badges } = passportData;
+  const data = passportData || passportService.getPassport();
+  const { xp = 0, level = 1, tier = 'Bleacher Rookie', totalCheers = 0, matchesAttended = [], badges = [] } = data || {};
 
   return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md animate-fadeIn">
+    <div 
+      className="fixed inset-0 z-[10000] flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md animate-fadeIn"
+      onClick={onClose}
+    >
       <div 
         className="w-full max-w-lg bg-white dark:bg-pitch-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}

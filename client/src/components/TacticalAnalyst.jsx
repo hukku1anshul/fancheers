@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Brain, HelpCircle, ChevronRight, X, Sparkles, RefreshCw, Compass } from 'lucide-react';
+import { getApiBaseUrl } from '../services/socket';
 
 export default function TacticalAnalyst({ match }) {
   const [insightData, setInsightData] = useState(null);
@@ -10,7 +11,8 @@ export default function TacticalAnalyst({ match }) {
   const fetchInsight = async (query = null) => {
     try {
       setLoading(true);
-      const url = new URL('http://localhost:3001/api/tactical/insight');
+      const baseUrl = getApiBaseUrl() || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3001');
+      const url = new URL(`${baseUrl}/api/tactical/insight`);
       if (match?.id) url.searchParams.set('matchId', match.id);
       if (query) url.searchParams.set('query', query);
 

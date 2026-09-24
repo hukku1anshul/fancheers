@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trophy, Flame, Users, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
-import { getSocket } from '../services/socket';
+import { getSocket, getApiBaseUrl } from '../services/socket';
 
 export default function CreatorStandsModal({ isOpen, onClose, selectedStandId, onSelectStand }) {
   const [stands, setStands] = useState([]);
@@ -8,7 +8,8 @@ export default function CreatorStandsModal({ isOpen, onClose, selectedStandId, o
 
   const fetchStands = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/creator-stands');
+      const baseUrl = getApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/creator-stands`);
       if (res.ok) {
         const data = await res.json();
         setStands(data.stands || []);

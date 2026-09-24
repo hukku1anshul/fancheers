@@ -20,7 +20,7 @@ import { notificationService } from './services/notificationService';
 import { venueGeofence } from './services/venueGeofenceService';
 import { tvSync } from './services/tvSyncService';
 import { hapticEngine } from './services/hapticEngine';
-import { getApiBaseUrl, socket, joinMatchRoom, leaveMatchRoom, sendCheer } from './services/socket';
+import { getApiBaseUrl, socket, joinMatchRoom, leaveMatchRoom, sendCheer, onConnectionStatusChange } from './services/socket';
 import { soundEngine } from './services/soundEffects';
 
 // Route-Based Code-Splitting: Lazy-load heavy secondary modals to minimize initial JS bundle
@@ -41,6 +41,8 @@ const MatchListModal = lazy(() => import('./components/MatchListModal'));
 const VenueGeofenceModal = lazy(() => import('./components/VenueGeofenceModal'));
 const StreamOverlayModal = lazy(() => import('./components/StreamOverlayModal'));
 const StreamOverlayView = lazy(() => import('./components/StreamOverlayView'));
+const ServerConnectionModal = lazy(() => import('./components/ServerConnectionModal'));
+const MobileDrawerModal = lazy(() => import('./components/MobileDrawerModal'));
 
 const SPORTS = [
   { id: 'all', label: 'All Sports', icon: '🏆' },
@@ -114,6 +116,34 @@ export default function App() {
   });
   const [passportData, setPassportData] = useState(() => passportService.getPassport());
   const [userCheers, setUserCheers] = useState(0);
+  const [mobileTab, setMobileTab] = useState('stadium');
+  const [mobileCombo, setMobileCombo] = useState(0);
+  const [isServerModalOpen, setIsServerModalOpen] = useState(false);
+  const [isDrawerModalOpen, setIsDrawerModalOpen] = useState(false);
+  const [serverStatus, setServerStatus] = useState('connected');
+
+  // Monitor connection status
+  useEffect(() => {
+    const unsub = onConnectionStatusChange((conn) => {
+      setServerStatus(conn.status);
+    });
+    return () => unsub();
+  }, []);
+
+  const handleSelectMobileTab = (tabId) => {
+    setMobileTab(tabId);
+    if (tabId === 'stadium') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (tabId === 'matches') {
+      setIsMatchModalOpen(true);
+    } else if (tabId === 'wall') {
+      setMobileTab('wall');
+    } else if (tabId === 'stats') {
+      setIsDossierOpen(true);
+    } else if (tabId === 'passport') {
+      setIsPassportOpen(true);
+    }
+  };
 
   // Zero-Friction Deep-Link Auto-Join (?squad=..., ?match=...)
   useEffect(() => {
@@ -166,21 +196,6 @@ export default function App() {
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('fanpulse_theme') || 'light';
   });
-
-  // Mobile Active Tab: 'stadium' | 'matches' | 'wall' | 'stats' | 'passport'
-  const [mobileTab, setMobileTab] = useState('stadium');
-  const [mobileCombo, setMobileCombo] = useState(0);
-
-  const handleSelectMobileTab = (tab) => {
-    setMobileTab(tab);
-    if (tab === 'matches') {
-      setIsMatchModalOpen(true);
-    } else if (tab === 'stats') {
-      setIsDossierOpen(true);
-    } else if (tab === 'passport') {
-      setIsPassportOpen(true);
-    }
-  };
 
   // Match status filter: 'all' | 'live' | 'stumps' | 'pre' | 'post'
   const [statusFilter, setStatusFilter] = useState('all');
@@ -497,6 +512,9 @@ export default function App() {
 
       {/* Top Navigation */}
       <Navbar
+        onOpenServerModal={() => setIsServerModalOpen(true)}
+        serverStatus={serverStatus}
+        onOpenMobileDrawer={() => setIsDrawerModalOpen(true)}
         onOpenPassport={() => setIsPassportOpen(true)}
         onOpenSquad={() => setIsSquadOpen(true)}
         onOpenStands={() => setIsStandsOpen(true)}
@@ -823,7 +841,10 @@ export default function App() {
         {/* Full Searchable Match Directory Modal / Drawer */}
         <MatchListModal
           isOpen={isMatchModalOpen}
-          onClose={() => setIsMatchModalOpen(false)}
+          onClose={() => {
+            setIsMatchModalOpen(false);
+            setMobileTab('stadium');
+          }}
           matches={visibleMatches}
           activeMatch={activeMatch}
           onSelectMatch={setActiveMatch}
@@ -835,7 +856,10 @@ export default function App() {
         {/* Superfan Passport Modal */}
         <SuperfanPassport
           isOpen={isPassportOpen}
-          onClose={() => setIsPassportOpen(false)}
+          onClose={() => {
+            setIsPassportOpen(false);
+            setMobileTab('stadium');
+          }}
           passportData={passportData}
         />
 
@@ -868,8 +892,11 @@ export default function App() {
         {/* Match Intelligence Dossier Modal */}
         <MatchDossier
           isOpen={isDossierOpen}
-          onClose={() => setIsDossierOpen(false)}
-          match={activeMatch}
+          onClose={() => {
+            setIsDossierOpen(false);
+            setMobileTab('stadium');
+          }}
+          match={activeMatch || matches[0]}
         />
 
         {/* The Locker Room Off-Matchday Hub */}
@@ -923,6 +950,51 @@ export default function App() {
           isOpen={isStreamModalOpen}
           onClose={() => setIsStreamModalOpen(false)}
           activeMatch={activeMatch}
+        />
+
+        {/* Server Connection Status & Settings Modal */}
+        <ServerConnectionModal
+          isOpen={isServerModalOpen}
+          onClose={() => setIsServerModalOpen(false)}
+          onServerChanged={() => {
+            loadMatches();
+          }}
+        />
+
+        {/* Mobile Stadium Hub Bottom Sheet Drawer */}
+        <MobileDrawerModal
+          isOpen={isDrawerModalOpen}
+          onClose={() => setIsDrawerModalOpen(false)}
+          onOpenServerSettings={() => setIsServerModalOpen(true)}
+          serverStatus={serverStatus}
+          onOpenFollowTeams={() => {
+            setIsFollowTeamsOpen(true);
+            setFollowedCount(teamFollowService.getCount());
+          }}
+          followedCount={followedCount}
+          onOpenVenueGeofence={() => setIsVenueModalOpen(true)}
+          isVenueActive={isVenueActive}
+          onOpenStreamOverlay={() => setIsStreamModalOpen(true)}
+          onOpenPassport={() => setIsPassportOpen(true)}
+          onOpenSquad={() => setIsSquadOpen(true)}
+          activeSquadCode={activeSquad?.code}
+          onOpenStands={() => setIsStandsOpen(true)}
+          onOpenLockerRoom={() => setIsLockerRoomOpen(true)}
+          onOpenCosmetics={() => setIsCosmeticsOpen(true)}
+          onToggleTvMode={() => setViewMode('tv')}
+          onToggleZenMode={() => setZenMode((prev) => !prev)}
+          isSilentMode={isSilentMode}
+          onToggleSilentMode={() => {
+            const s = !isSilentMode;
+            setIsSilentMode(s);
+            soundEngine.toggleMute(s);
+          }}
+          isMuted={soundEngine.isMuted}
+          onToggleMute={() => {
+            const m = soundEngine.toggleMute();
+            if (!m) soundEngine.playAirhorn();
+          }}
+          onOpenReplayRadar={() => setIsReplayRadarOpen(true)}
         />
       </Suspense>
 
